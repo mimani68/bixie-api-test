@@ -14,19 +14,30 @@ import { Station } from '../model';
 export const stationsRouter = express.Router();
 
 stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Response) => {
-  let result;
   let querySchema = object({
     at: string().isoDate().required()
   })
-  let { error, value } = querySchema.validate( req.params ) 
+  let { error, value } = querySchema.validate( req.query ) 
+  let stations;
   if ( !error ) {
-    result = await Station.queryOnStations( req.params.at )
+    stations = await Station.queryOnStations( req.params.at )
   } else {
-    result = await Station.getAllStations()
+    stations = await Station.getAllStations()
+  }
+  // 
+  // FIXME: weather api
+  // 
+  let response: any = {
+    weather: {},
+    stations: stations
+  
+  }
+  if ( req.query.at ) {
+    response['at'] = req.query.at.toString()
   }
   return res
     .status(StatusCodes.OK)
-    .json(error);
+    .json(response);
 });
 
 stationsRouter.get('/:stationsId', verificationMiddleware, (req: Request, res: Response) => {

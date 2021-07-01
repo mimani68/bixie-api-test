@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
-import { get } from 'config'
+import { config } from '../config'
 
-const filePath = `${ get('App.db.file_path') }`
+const filePath = config.FILE_PATH
 
 export class Station {
 

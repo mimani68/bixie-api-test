@@ -6,7 +6,7 @@ import {
   sign,
   verify
 } from 'jsonwebtoken';
-import { get } from 'config'
+import { config } from '../config'
 import {
   ReasonPhrases,
   StatusCodes,
@@ -19,7 +19,7 @@ import {
 
 import { verificationMiddleware, ACL_admin } from '../middleware';
 
-const SECRET: string = get('App.secret');
+const SECRET: string = config.SECRET;
 
 export const userRouter = express.Router();
 
