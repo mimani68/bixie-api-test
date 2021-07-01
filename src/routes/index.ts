@@ -23,7 +23,7 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
   let { error, value } = querySchema.validate( req.query ) 
   let stations;
   if ( !error ) {
-    stations = await StationService.queryOnStations( req.params.at )
+    stations = await StationService.queryOnStations( `${req.query.at}`, new Date().toISOString() )
   } else {
     stations = await StationService.getAllStations()
   }
