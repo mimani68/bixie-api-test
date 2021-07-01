@@ -1,1 +1,2 @@
-export { Stations } from './weather'
+export { Stations } from './stations'
+export { Weather  } from './weather'

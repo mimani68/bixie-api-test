@@ -1,6 +1,7 @@
 import axois, { Method } from 'axios'
 
 import { config } from '../config'
+import { Weather } from '../models'
 import { error } from '../utils/log'
 
 export class WeatherService {
@@ -17,12 +18,14 @@ export class WeatherService {
   }
 
   static async updateWeatherInfo( citySymbol: string ) {
-    return await WeatherService.getLatestWeatherInfo( citySymbol )
-      .then( el => {
-        
-        return true
-      })
+    let value = WeatherService.getLatestWeatherInfo( citySymbol )
+    return await Weather.create({
+      data: JSON.stringify(value),
+      captureTime: new Date().toISOString()
+    })
+      .then(_ => true)
       .catch( err => {
+        error(err)
         return false
       })
   }

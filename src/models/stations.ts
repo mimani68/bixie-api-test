@@ -1,12 +1,11 @@
 import { db, DataTypes } from '../db/postgres'
 
 export const Stations = db.define('station', {
-    firstName: {
+    data: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    lastName: {
+    captureTime: {
       type: DataTypes.STRING
     }
-  }, {
   });

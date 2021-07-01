@@ -1,5 +1,7 @@
 import { readFileSync } from 'fs'
 import { config } from '../config'
+import { Stations } from '../models'
+import { error } from '../utils/log'
 
 const filePath = config.FILE_PATH
 
@@ -24,7 +26,16 @@ export class StationService {
   }
 
   static async updateStationData() {
-    
+    let value = StationService.getAllStations()
+    return await Stations.create({
+      data: JSON.stringify(value),
+      captureTime: new Date().toISOString()
+    })
+      .then(_ => true)
+      .catch( err => {
+        error(err)
+        return false
+      })
   }
 
 }
