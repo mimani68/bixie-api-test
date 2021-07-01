@@ -29,7 +29,7 @@ RUN npm run build
 
 EXPOSE ${PORT}
 
-CMD [ "node", "dist/main.js" ]
+CMD [ "node", "dist/server.js" ]
 
 #
 #    88888888ba,

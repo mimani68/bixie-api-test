@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
-import { object, string } from 'joi'
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { object, string } from 'joi'
 
-import { verificationMiddleware } from '../middleware';
+import { verificationMiddleware         } from '../middleware';
 import { StationService, WeatherService } from '../services';
+import { ResponseModelInterface         } from '../view_model';
 import { config } from '../config';
-import { ResponseModelInterface } from '../view_model';
 
 let lastUpdate = new Date();
 const UPDATE_INTERVAL_IN_HOURS = 1;
@@ -31,14 +31,7 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
     })
     validationObject = querySchema.validate( req.query )
   }
-  if ( req.query.from && req.query.to && req.query.frequency ) {
-    querySchema = object({
-      from: string().isoDate().required(),
-      to: string().isoDate().required(),
-      frequency: string().required()
-    })
-    validationObject = querySchema.validate( req.query )
-  }
+
   /**
    * 
    * User `StationService` and `WeatherService` for retrive data from
@@ -82,20 +75,65 @@ stationsRouter.get('/:stationsId', verificationMiddleware, async (req: Request, 
    * validate input value from user
    * 
    */
-  let inputSchema = object({
-    stationsId: string().required(),
-    at: string().isoDate().required()
-  })
-  let { error, value } = inputSchema.validate({ at: req.query.at, stationsId: req.params.stationsId }) 
-  if ( error ) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .send(ReasonPhrases.BAD_REQUEST);
+  let querySchema;
+  let validationObject;
+  if ( req.query.at ) {
+    querySchema = object({
+      stationsId: string().required(),
+      at: string().isoDate().required()
+    })
+    // validationObject = querySchema.validate( req.query )
+    validationObject = querySchema.validate({
+      at: req.query.at,
+      stationsId: req.params.stationsId
+    }) 
   }
-  let station = await StationService.queryOnStationsIds(req.params.stationsId, `${ req.query.at }`, new Date().toISOString());
+  if ( req.query.from && req.query.to && req.query.frequency ) {
+    querySchema = object({
+      stationsId: string().required(),
+      from: string().isoDate().required(),
+      to: string().isoDate().required(),
+      frequency: string().required()
+    })
+    validationObject = querySchema.validate({
+      from: req.query.from,
+      to: req.query.to,
+      stationsId: req.params.stationsId
+    })
+  }
+  if ( validationObject?.error ) {
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .send(ReasonPhrases.NOT_FOUND);
+  }
+  /**
+   * 
+   * Retrive data by stationId
+   * 
+   */
+  let s;
+  let w;
+  if ( req.query.at ) {
+    s = await StationService.queryOnStationsIds(req.params.stationsId, new Date(`${ req.query.at }`), new Date());
+    w = await WeatherService.getLatestWeatherInfo( config.CITY )
+  }
+  if ( req.query.from ) {
+    s = await StationService.queryOnStationsIds(req.params.stationsId, new Date(`${ req.query.from }`), new Date(`${ req.query.to }`));
+    w = await WeatherService.getLatestWeatherInfo( config.CITY )
+  }
+  /**
+   * 
+   * Show the finial result
+   * 
+   */
+  let response: ResponseModelInterface = {
+    weather: w,
+    stations: s,
+    at: `${ req.query.at }`
+  }
   res
     .status(StatusCodes.OK)
-    .send(station);
+    .send(response);
 });
 
 /**

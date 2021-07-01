@@ -1,5 +1,5 @@
 import { yellowBright } from 'chalk';
-import { config } from 'dotenv'
+import { config       } from 'dotenv'
 
 if ( process.env.NODE_ENV === 'local' ) {
   config()

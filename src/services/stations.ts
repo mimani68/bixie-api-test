@@ -1,20 +1,25 @@
 import { isEmpty } from 'lodash'
-import { or, and } from 'sequelize'
+import { Op, and } from 'sequelize'
 
-import { config } from '../config'
-import { Stations } from '../models'
-import { error } from '../utils/log'
+import { config     } from '../config'
+import { Stations   } from '../models'
+import { error      } from '../utils/log'
 import { stationApi } from '../utils/station_api'
-
-const LIMIT  = 100;
-const OFFSET = 0;
 
 export class StationService {
 
-  static async getAllStations() {
+  /**
+   * 
+   * @returns Promise
+   * 
+   */
+  static async getAllStations(): Promise<any> {
     return await Stations.findAll({ 
       offset: config.PAGE_OFFSET,
       limit: config.PAGE_LIMIT,
+      order: [
+        ['createdAt', 'DESC' ]
+      ],
       raw: true
     })
       .then( (d: any) => {
@@ -27,7 +32,13 @@ export class StationService {
       })
   }
 
-  static async queryOnStations(from: Date, sicne: Date) {
+  
+  /**
+   * @param  {Date} from
+   * @param  {Date} sicne
+   * @returns Promise
+   */
+  static async queryOnStations(from: Date, sicne: Date): Promise<any> {
     return await Stations.findAll({
       where: and(
         { createdAt: { gte: from } },
@@ -35,6 +46,9 @@ export class StationService {
       ),
       offset: config.PAGE_OFFSET,
       limit: config.PAGE_LIMIT,
+      order: [
+        ['createdAt', 'DESC' ]
+      ],
       raw: true
     })
       .then( (d: any) => {
@@ -47,12 +61,22 @@ export class StationService {
       })
   }
 
-  static async queryOnStationsIds(stationId: string, from: string, sicne: string) {
+  
+  /**
+   * @param  {string} stationId
+   * @param  {Date} from
+   * @param  {Date} sicne
+   * @returns Promise
+   */
+  static async queryOnStationsIds(stationId: string, from: Date, sicne: Date): Promise<any> {
     return await Stations.findAll({
       where: and(
         { station_id: stationId },
-        { createdAt: { gte: from }},
-        { createdAt: { lte: sicne }}
+        { createdAt: {
+            [Op.gt]: from ,
+            [Op.lt]: sicne
+          }
+        }
       ),
       order: [
         ['createdAt', 'DESC' ]
@@ -71,7 +95,11 @@ export class StationService {
       })
   }
 
-  static async updateStationData() {  
+  
+  /**
+   * @returns Promise
+   */
+  static async updateStationData(): Promise<any> {  
     let value = await stationApi()
     if ( !value.success )
       return false

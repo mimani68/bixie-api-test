@@ -5,8 +5,6 @@ export async function hashPassword(plainText: string) {
     const salt = genSaltSync(10);
     const hashPass = hashSync(plainText, salt);
 
-    // userColl[0].password = hashPass
-
 }
 
 export async function CheckPassword(plainText: string, hash: string) : Promise<boolean> {
