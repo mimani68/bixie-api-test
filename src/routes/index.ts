@@ -18,22 +18,52 @@ export const stationsRouter = express.Router();
  * 
  */
 stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Response) => {
-  let querySchema = object({
-    at: string().isoDate().required()
-  })
-  let { error, value } = querySchema.validate( req.query ) 
-  let stations;
-  if ( !error ) {
-    stations = await StationService.queryOnStations( `${req.query.at}`, new Date().toISOString() )
-  } else {
-    stations = await StationService.getAllStations()
+  let querySchema: any;
+  let validationObject: any;
+  /**
+   * 
+   * validate input value from user
+   * 
+   */
+  if ( req.query.at ) {
+    querySchema = object({
+      at: string().isoDate().required()
+    })
+    validationObject = querySchema.validate( req.query )
   }
-  let w: any = await WeatherService.getLatestWeatherInfo( config.CITY )
+  if ( req.query.from && req.query.to && req.query.frequency ) {
+    querySchema = object({
+      from: string().isoDate().required(),
+      to: string().isoDate().required(),
+      frequency: string().required()
+    })
+    validationObject = querySchema.validate( req.query )
+  }
+  /**
+   * 
+   * User `StationService` and `WeatherService` for retrive data from
+   * database
+   * 
+   */
+  let s: any;
+  let w: any;
+  if ( !validationObject.error ) {
+    s = await StationService.queryOnStations( `${req.query.at}`, new Date().toISOString() )
+    w = await WeatherService.getLatestWeatherInfo( config.CITY )
+  } else {
+    s = await StationService.getAllStations()
+    w = await WeatherService.getLatestWeatherInfo( config.CITY, `${req.query.at}` )
+  }
+  /**
+   * 
+   * Create final responce
+   * 
+   */
   let response: ResponseModelInterface = {
     weather: w.success ? w.data : {},
-    stations: stations
+    stations: s
   }
-  if ( !error && req.query.at ) {
+  if ( !validationObject.error && req.query.at ) {
     response['at'] = req.query.at.toString()
   }
   return res
@@ -47,6 +77,11 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
  * 
  */
 stationsRouter.get('/:stationsId', verificationMiddleware, async (req: Request, res: Response) => {
+  /**
+   * 
+   * validate input value from user
+   * 
+   */
   let inputSchema = object({
     stationsId: string().required(),
     at: string().isoDate().required()
@@ -71,13 +106,15 @@ stationsRouter.get('/:stationsId', verificationMiddleware, async (req: Request, 
 stationsRouter.post('/', verificationMiddleware, async (req: Request, res: Response) => {
   let nextStoreData = new Date(lastUpdate)
   nextStoreData.setHours( nextStoreData.getHours() + +UPDATE_INTERVAL_IN_HOURS )
-  if ( nextStoreData <= new Date() ) {
-    await StationService.updateStationData()
-    await WeatherService.updateWeatherInfo( config.CITY )
+  // if ( nextStoreData <= new Date() ) {
+  if ( true ) {
+    let e = await StationService.updateStationData()
+    // await WeatherService.updateWeatherInfo( config.CITY )
     nextStoreData = new Date()
     return res
       .status(StatusCodes.CREATED)
-      .json(ReasonPhrases.CREATED);
+      // .json(ReasonPhrases.CREATED);
+      .json(e);
   } else {
     return res
       .status(StatusCodes.BAD_REQUEST)

@@ -1,8 +1,9 @@
 import { or, and } from 'sequelize'
 
+import { config } from '../config'
 import { Stations } from '../models'
 import { error } from '../utils/log'
-import { stationApi } from '../utils/station_api';
+import { stationApi } from '../utils/station_api'
 
 const LIMIT = 100;
 const OFFSET = 0;
@@ -19,8 +20,8 @@ export class StationService {
         { captureTime: { gte: from } },
         { captureTime: { lte: sicne } }
       ),
-      offset: OFFSET,
-      limit: LIMIT
+      offset: config.PAGE_OFFSET,
+      limit: config.PAGE_LIMIT
     })
   }
 
@@ -34,12 +35,12 @@ export class StationService {
       order: [
         ['captureTime', 'DESC' ]
       ],
-      offset: OFFSET,
-      limit: LIMIT
+      offset: config.PAGE_OFFSET,
+      limit: config.PAGE_LIMIT
     })
   }
 
-  static async updateStationData() {
+  static async updateStationData() {  
     let value = await stationApi()
     let e = []
     for ( let item of value.features ) {
