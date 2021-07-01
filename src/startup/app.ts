@@ -6,12 +6,23 @@ import * as cors from 'cors';
 import { db } from '../db/postgres'
 import { stationsRouter } from '../routes';
 
+/**
+ * 
+ * Force database sync and update
+ * 
+ */
 db.sync()
 
 export const app: Application = express();
 
 app.use(json());
 app.use(cors.default())
+
+/**
+ * 
+ * Security plugins
+ * 
+ */
 app.use(helmet.contentSecurityPolicy());
 app.use(helmet.dnsPrefetchControl());
 app.use(helmet.expectCt());
@@ -35,6 +46,11 @@ app.get('/ping', (req: Request, res: Response)=>{
  */
 app.use('/api/v1/stations', stationsRouter);
 
+/**
+ * 
+ * Readiness end-point
+ * 
+ */
 app.use('/healthz', (req: Request, res: Response)=>{
     res.send('Ok');
 });

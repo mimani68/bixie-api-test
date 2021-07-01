@@ -1,3 +1,4 @@
+import { isEmpty } from 'lodash'
 import { or, and } from 'sequelize'
 
 import { config } from '../config'
@@ -12,42 +13,61 @@ export class StationService {
 
   static async getAllStations() {
     return await Stations.findAll()
+      .then( (d: any) => {
+        if ( isEmpty(d) )
+          return 
+        d.data = JSON.parse(d.data)
+        return d
+      })
   }
 
   static async queryOnStations(from: string, sicne: string) {
     return await Stations.findAll({
       where: and(
-        { captureTime: { gte: from } },
-        { captureTime: { lte: sicne } }
+        { createdAt: { gte: from } },
+        { createdAt: { lte: sicne } }
       ),
       offset: config.PAGE_OFFSET,
       limit: config.PAGE_LIMIT
     })
+      .then( (d: any) => {
+        if ( isEmpty(d) )
+          return
+        d.data = JSON.parse(d.data)
+        return d
+      })
   }
 
   static async queryOnStationsIds(stationId: string, from: string, sicne: string) {
     return await Stations.findAll({
       where: and(
         { station_id: stationId },
-        { captureTime: { gte: from }},
-        { captureTime: { lte: sicne }}
+        { createdAt: { gte: from }},
+        { createdAt: { lte: sicne }}
       ),
       order: [
-        ['captureTime', 'DESC' ]
+        ['createdAt', 'DESC' ]
       ],
       offset: config.PAGE_OFFSET,
       limit: config.PAGE_LIMIT
     })
+      .then( (d: any) => {
+        if ( isEmpty(d) )
+          return
+        d.data = JSON.parse(d.data)
+        return d
+      })
   }
 
   static async updateStationData() {  
     let value = await stationApi()
+    if ( !value.success )
+      return false
     let e = []
-    for ( let item of value.features ) {
+    for ( let item of value.data.features ) {
       e.push({
         station_id: item.properties.id,
         data: JSON.stringify(item.properties),
-        captureTime: new Date().toISOString()
       })
     }
     return await Stations.bulkCreate(e)

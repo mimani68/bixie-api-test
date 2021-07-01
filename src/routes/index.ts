@@ -47,12 +47,12 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
    */
   let s: any;
   let w: any;
-  if ( !validationObject.error ) {
+  if ( validationObject && !validationObject.error ) {
     s = await StationService.queryOnStations( `${req.query.at}`, new Date().toISOString() )
     w = await WeatherService.getLatestWeatherInfo( config.CITY )
   } else {
     s = await StationService.getAllStations()
-    w = await WeatherService.getLatestWeatherInfo( config.CITY, `${req.query.at}` )
+    w = await WeatherService.getLatestWeatherInfo( config.CITY )
   }
   /**
    * 
@@ -108,17 +108,16 @@ stationsRouter.post('/', verificationMiddleware, async (req: Request, res: Respo
   nextStoreData.setHours( nextStoreData.getHours() + +UPDATE_INTERVAL_IN_HOURS )
   // if ( nextStoreData <= new Date() ) {
   if ( true ) {
-    let e = await StationService.updateStationData()
-    // await WeatherService.updateWeatherInfo( config.CITY )
+    await StationService.updateStationData()
+    await WeatherService.updateWeatherInfo( config.CITY )
     nextStoreData = new Date()
     return res
       .status(StatusCodes.CREATED)
-      // .json(ReasonPhrases.CREATED);
-      .json(e);
+      .send(ReasonPhrases.CREATED);
   } else {
     return res
       .status(StatusCodes.BAD_REQUEST)
-      .json(ReasonPhrases.BAD_REQUEST);
+      .send(ReasonPhrases.BAD_REQUEST);
   }
 });
 

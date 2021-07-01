@@ -1,15 +1,12 @@
 import { db, DataTypes } from '../db/postgres'
 
-export const Stations = db.define('station', {
+export const Stations = db.define('stations', {
   station_id: {
     type: DataTypes.STRING,
     allowNull: false
   },
   data: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false
-  },
-  captureTime: {
-    type: DataTypes.STRING
   }
 });

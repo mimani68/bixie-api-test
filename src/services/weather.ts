@@ -1,4 +1,4 @@
-import { and } from 'sequelize'
+import { and, Op } from 'sequelize'
 
 import { Weather } from '../models'
 import { config } from '../config'
@@ -13,8 +13,11 @@ export class WeatherService {
     return await Weather.findAll({
       where: and(
         { city: citySymbol },
-        { captureTime: { gte: time } },
-        { captureTime: { lte: new Date().toISOString() } }
+        { createdAt: {
+            [Op.gt]: new Date(time),
+            [Op.lt]: new Date()
+          }
+        }
       ),
       offset: config.PAGE_OFFSET,
       limit: config.PAGE_LIMIT
@@ -24,12 +27,12 @@ export class WeatherService {
   static async updateWeatherInfo( citySymbol: string ) {
     let value = await weatherApi( citySymbol )
     if ( !value.success )
-      return null
-    return await Weather.create({
-      data: JSON.stringify(value),
-      city: citySymbol, 
-      captureTime: new Date().toISOString()
-    })
+      return false
+    let e = {
+        city: citySymbol,
+        data: JSON.stringify(value.data),
+      }
+    return await Weather.create(e)
       .then(_ => true)
       .catch( err => {
         error(err)
