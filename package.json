@@ -9,7 +9,7 @@
     "dev": "nodemon --watch src/**/* -e ts,json --exec \"node --inspect=0.0.0.0:9229 -r ts-node/register src/server.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Mahdi Imani <imani.mahdi@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",
