@@ -2,7 +2,11 @@ import express, { Application, Request, Response } from 'express';
 import { json } from 'body-parser';
 import * as helmet from 'helmet'
 import * as cors from 'cors';
+
+import { db } from '../db/postgres'
 import { stationsRouter } from '../routes';
+
+db.sync()
 
 export const app: Application = express();
 
