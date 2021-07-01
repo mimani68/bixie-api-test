@@ -1,24 +1,16 @@
 {
-  "name": "fam-backend",
+  "name": "bixie-api-test",
   "version": "1.0.0",
   "description": "",
-  "main": "app.ts",
+  "main": "server.ts",
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc -p .",
     "dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/server.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/harmeh/FAM-Backend.git"
-  },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/harmeh/FAM-Backend/issues"
-  },
-  "homepage": "https://github.com/harmeh/FAM-Backend#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
