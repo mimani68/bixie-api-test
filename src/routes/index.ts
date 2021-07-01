@@ -5,6 +5,7 @@ import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { verificationMiddleware } from '../middleware';
 import { StationService, WeatherService } from '../services';
 import { config } from '../config';
+import { ResponseModelInterface } from '../view_model';
 
 let lastUpdate = new Date();
 const UPDATE_INTERVAL_IN_HOURS = 1;
@@ -28,9 +29,9 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
     stations = await StationService.getAllStations()
   }
   let w: any = await WeatherService.getLatestWeatherInfo( config.CITY )
-  let response: any = {
+  let response: ResponseModelInterface = {
     weather: w.success ? w.data : {},
-    // stations: stations
+    stations: stations
   }
   if ( !error && req.query.at ) {
     response['at'] = req.query.at.toString()
@@ -45,10 +46,21 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
  * Retrive single stations data with id
  * 
  */
-stationsRouter.get('/:stationsId', verificationMiddleware, (req: Request, res: Response) => {
+stationsRouter.get('/:stationsId', verificationMiddleware, async (req: Request, res: Response) => {
+  let inputSchema = object({
+    stationsId: string().required(),
+    at: string().isoDate().required()
+  })
+  let { error, value } = inputSchema.validate({ at: req.query.at, stationsId: req.params.stationsId }) 
+  if ( error ) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send(ReasonPhrases.BAD_REQUEST);
+  }
+  let station = await StationService.queryOnStationsIds(req.params.stationsId, `${ req.query.at }`, new Date().toISOString());
   res
-    .status(StatusCodes.NOT_IMPLEMENTED)
-    .send(ReasonPhrases.NOT_IMPLEMENTED);
+    .status(StatusCodes.OK)
+    .send(station);
 });
 
 /**

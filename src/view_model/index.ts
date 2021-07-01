@@ -1,0 +1,1 @@
+export { ResponseModelInterface } from './response'

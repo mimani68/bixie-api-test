@@ -1,8 +1,8 @@
-import { readFileSync } from 'fs';
 import { or, and } from 'sequelize'
-import { config } from '../config'
+
 import { Stations } from '../models'
 import { error } from '../utils/log'
+import { stationApi } from '../utils/station_api';
 
 const LIMIT = 100;
 const OFFSET = 0;
@@ -40,7 +40,7 @@ export class StationService {
   }
 
   static async updateStationData() {
-    let value = await StationService.getApi()
+    let value = await stationApi()
     let e = []
     for ( let item of value.features ) {
       e.push({
@@ -55,15 +55,6 @@ export class StationService {
         error(err)
         return false
       })
-  }
-
-  static async getApi() {
-    let e = readFileSync('db.json', 'utf-8')
-    try {
-      return await JSON.parse(e)
-    } catch (error) {
-      return { message: 'failed parse json' }
-    }
   }
 
 }
