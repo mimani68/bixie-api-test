@@ -1,7 +1,7 @@
 import { db, DataTypes } from '../db/postgres'
 
 export const Stations = db.define('station', {
-  id: {
+  station_id: {
     type: DataTypes.STRING,
     allowNull: false
   },

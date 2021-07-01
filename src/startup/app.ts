@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import { json } from 'body-parser';
 import * as helmet from 'helmet'
 import * as cors from 'cors';
-import { stationsRouter, userRouter } from '../routes';
+import { stationsRouter } from '../routes';
 
 export const app: Application = express();
 
@@ -29,7 +29,6 @@ app.get('/ping', (req: Request, res: Response)=>{
  * Bixie Api Server
  * 
  */
-app.use('/api/v1/user',     userRouter);
 app.use('/api/v1/stations', stationsRouter);
 
 app.use('/healthz', (req: Request, res: Response)=>{

@@ -1,6 +1,9 @@
 import { yellowBright } from 'chalk';
 import { config } from 'dotenv'
-config()
+
+if ( process.env.NODE_ENV === 'local' ) {
+  config()
+}
 
 import { config as configObject } from './config'
 import { app } from './startup/app';

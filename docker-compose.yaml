@@ -43,13 +43,14 @@ services:
             - web
     
     app:
-        build: 
-            context: .
-            target: development
+        image: node:14-slim
+        # build: 
+        #     context: .
+        #     target: development
         restart: always
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.app.rule=Host(`api.localhost`)"
+            - "traefik.http.routers.app.rule=Host(`localhost`)"
             - "traefik.http.routers.app.entrypoints=web"
             # - "traefik.http.routers.app.entrypoints=websecure"
             # - "traefik.http.routers.app.tls.certresolver=app"
@@ -58,6 +59,8 @@ services:
         environment:
             PORT: 3000
             NODE_ENV: development
+            WEATHER_API_KEY: ef1b11ce9156d52b684dc65275739551
+            DB_CONNECTION_URL: postgres://user:test@db:5432/app
         ports:
             - "9229:9229"
         volumes:
@@ -66,11 +69,8 @@ services:
             - internal
         command: ["npm", "run", "dev"]
         
-
-
-
     db:
-        image: $POSTGRES_IMAGE
+        image: postgres:12.3
         restart: always
         environment:
             POSTGRES_DB: app
@@ -91,7 +91,7 @@ services:
             - internal
 
     adminer:
-        image: ${ADMINER_IMAGE}
+        image: adminer:latest
         restart: always
         labels:
             - "traefik.enable=true"
