@@ -18,7 +18,9 @@ export class WeatherService {
   }
 
   static async updateWeatherInfo( citySymbol: string ) {
-    let value = WeatherService.getLatestWeatherInfo( citySymbol )
+    let value = await WeatherService.getLatestWeatherInfo( citySymbol )
+    if ( !value.success )
+      return null
     return await Weather.create({
       data: JSON.stringify(value),
       captureTime: new Date().toISOString()

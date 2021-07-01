@@ -26,11 +26,16 @@ export class StationService {
   }
 
   static async updateStationData() {
-    let value = StationService.getAllStations()
-    return await Stations.create({
-      data: JSON.stringify(value),
-      captureTime: new Date().toISOString()
-    })
+    let value = await StationService.getAllStations()
+    let e = []
+    for ( let item of value.features ) {
+      e.push({
+        id: item.properties.id,
+        data: JSON.stringify(item.properties),
+        captureTime: new Date().toISOString()
+      })
+    }
+    return await Stations.bulkCreate(e)
       .then(_ => true)
       .catch( err => {
         error(err)

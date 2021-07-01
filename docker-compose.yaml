@@ -1,0 +1,105 @@
+version: "3.7"
+
+networks:
+    internal:
+    web:
+
+services:
+
+    proxy:
+        image: traefik:2.4
+        command:
+            # - "--log.level=DEBUG"
+            - "--api=true"
+            - "--api.dashboard=true"
+            - "--api.insecure=true"
+            - "--providers.docker"
+            - "--entrypoints.web.address=:80"
+            # - "--entryPoints.websecure.address=:443"
+            # - "--certificatesResolvers.yas.acme.httpchallenge=true"
+            # - "--certificatesresolvers.yas.acme.httpchallenge.entrypoint=web"
+            # - "--certificatesresolvers.yas.acme.email=sample@localhost.ir"
+            # - "--certificatesresolvers.yas.acme.storage=/letsencrypt/acme.json"
+        volumes:
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+              read_only: true
+        ports:
+            - target: 80
+              published: 80
+              protocol: tcp
+              mode: host
+            - target: 8080
+              published: 8080
+              protocol: tcp
+              mode: host
+            - target: 443
+              published: 443
+              protocol: tcp
+              mode: host
+        networks:
+            - internal
+            - web
+    
+    app:
+        build: 
+            context: .
+            target: development
+        restart: always
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.app.rule=Host(`api.localhost`)"
+            - "traefik.http.routers.app.entrypoints=web"
+            # - "traefik.http.routers.app.entrypoints=websecure"
+            # - "traefik.http.routers.app.tls.certresolver=app"
+            - "traefik.http.services.app.loadbalancer.server.port=3000"
+        working_dir: /app
+        environment:
+            PORT: 3000
+            NODE_ENV: development
+        ports:
+            - "9229:9229"
+        volumes:
+            - ./:/app
+        networks:
+            - internal
+        command: ["npm", "run", "dev"]
+        
+
+
+
+    db:
+        image: $POSTGRES_IMAGE
+        restart: always
+        environment:
+            POSTGRES_DB: app
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: test
+            # ALLOW_IP_RANGE: 0.0.0.0/0
+            # PGHOST: db
+            # PGDATABASE: postgres
+            # PGUSER: postgres
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        networks:
+            - internal
+
+    adminer:
+        image: ${ADMINER_IMAGE}
+        restart: always
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.storage.rule=Host(`db.localhost`) && PathPrefix(`/adminer`)"
+            - "traefik.http.services.storage.loadbalancer.server.port=8080"
+            - "traefik.http.routers.storage.entrypoints=web"
+        networks:
+            - internal
+
+volumes:
+    postgres-data:

@@ -42,7 +42,7 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
 
 /**
  * 
- * Retrive stations data with id
+ * Retrive single stations data with id
  * 
  */
 stationsRouter.get('/:stationsId', verificationMiddleware, (req: Request, res: Response) => {
@@ -59,7 +59,7 @@ stationsRouter.get('/:stationsId', verificationMiddleware, (req: Request, res: R
 stationsRouter.post('/', verificationMiddleware, async (req: Request, res: Response) => {
   let nextStoreData = new Date(lastUpdate)
   nextStoreData.setHours( nextStoreData.getHours() + +UPDATE_INTERVAL_IN_HOURS )
-  if ( nextStoreData < new Date() ) {
+  if ( nextStoreData <= new Date() ) {
     await StationService.updateStationData()
     await WeatherService.updateWeatherInfo( config.CITY )
     nextStoreData = new Date()
