@@ -1,10 +1,24 @@
 import express, { Application, Request, Response } from 'express';
 import { json } from 'body-parser';
-import { roleRouter, userRouter } from '../routes';
+import * as helmet from 'helmet'
+import * as cors from 'cors';
+import { stationsRouter, userRouter } from '../routes';
 
 export const app: Application = express();
 
 app.use(json());
+app.use(cors.default())
+app.use(helmet.contentSecurityPolicy());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
 app.get('/ping', (req: Request, res: Response)=>{
     res.send('PONG');
@@ -12,20 +26,15 @@ app.get('/ping', (req: Request, res: Response)=>{
 
 /**
  * 
- * FAM Server
+ * Bixie Api Server
  * 
  */
-app.use('/users',         userRouter);
-app.use('/roles',         roleRouter);
-// app.use('/networks',   networkRouter);
-// app.use('/regions',    regionsRouter);
-// app.use('/provinces',  provincesRouter);
-// app.use('/projects',   projectRouter);
-// app.use('/phases',     phasesRouter);
-// app.use('/assets',     assestRouter);
-// app.use('/docs',       docsRouter);
-// app.use('/operations', operationsRouter);
+app.use('/api/v1/user',     userRouter);
+app.use('/api/v1/stations', stationsRouter);
 
+app.use('/healthz', (req: Request, res: Response)=>{
+    res.send('Ok');
+});
 app.use('', (req: Request, res: Response)=>{
     res.send('OPS');
 });
