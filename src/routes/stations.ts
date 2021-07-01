@@ -9,7 +9,7 @@ import {
 } from 'http-status-codes';
 
 import { verificationMiddleware, ACL_admin } from '../middleware';
-import { Station } from '../model';
+import { StationService, WeatherService } from '../model';
 
 export const stationsRouter = express.Router();
 
@@ -20,19 +20,16 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
   let { error, value } = querySchema.validate( req.query ) 
   let stations;
   if ( !error ) {
-    stations = await Station.queryOnStations( req.params.at )
+    stations = await StationService.queryOnStations( req.params.at )
   } else {
-    stations = await Station.getAllStations()
+    stations = await StationService.getAllStations()
   }
-  // 
-  // FIXME: weather api
-  // 
+  let w: any = await WeatherService.getLatestWeatherInfo( 'London,uk' )
   let response: any = {
-    weather: {},
+    weather: w.success ? w.data : {},
     stations: stations
-  
   }
-  if ( req.query.at ) {
+  if ( !error && req.query.at ) {
     response['at'] = req.query.at.toString()
   }
   return res

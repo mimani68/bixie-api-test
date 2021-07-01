@@ -3,7 +3,7 @@ import { config } from '../config'
 
 const filePath = config.FILE_PATH
 
-export class Station {
+export class StationService {
 
   static async getAllStations() {
     let e = readFileSync(filePath, 'utf-8')
@@ -15,7 +15,7 @@ export class Station {
   }
 
   static async queryOnStations(at: string) {
-    let e = await Station.getAllStations()
+    let e = await StationService.getAllStations()
     if ( Array.isArray(e) ) {
       return e.filter( ( el: any ) => el.date === at )
     } else {
