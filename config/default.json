@@ -1,0 +1,15 @@
+{
+    "App": {
+        "port": 3000,
+        "secret": "hAE6faIx6cai1meQbaet0ohMoh4moh7Fo7mae5qWW2rie5oqa",
+        "db": {
+            "username": "user",
+            "password": "test",
+            "host": "mongodb",
+            "port": 27017
+        },
+        "credit": {
+            "initialDays": 30
+        }
+    }
+}
