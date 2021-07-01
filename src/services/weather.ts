@@ -16,4 +16,15 @@ export class WeatherService {
       })
   }
 
+  static async updateWeatherInfo( citySymbol: string ) {
+    return await WeatherService.getLatestWeatherInfo( citySymbol )
+      .then( el => {
+        
+        return true
+      })
+      .catch( err => {
+        return false
+      })
+  }
+
 }
