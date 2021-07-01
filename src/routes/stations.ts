@@ -2,6 +2,7 @@ import express, {
   Request,
   Response,
 } from 'express';
+import { object, string } from 'joi'
 import {
   ReasonPhrases,
   StatusCodes,
@@ -13,13 +14,22 @@ import { Station } from '../model';
 export const stationsRouter = express.Router();
 
 stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Response) => {
-  let result = await Station.getAllStations()
+  let result;
+  let querySchema = object({
+    at: string().isoDate().required()
+  })
+  let { error, value } = querySchema.validate( req.params ) 
+  if ( !error ) {
+    result = await Station.queryOnStations( req.params.at )
+  } else {
+    result = await Station.getAllStations()
+  }
   return res
     .status(StatusCodes.OK)
-    .json(result);
+    .json(error);
 });
 
-stationsRouter.get('//:stationsId', verificationMiddleware, (req: Request, res: Response) => {
+stationsRouter.get('/:stationsId', verificationMiddleware, (req: Request, res: Response) => {
   res
     .status(StatusCodes.NOT_IMPLEMENTED)
     .send(ReasonPhrases.NOT_IMPLEMENTED);
@@ -31,13 +41,13 @@ stationsRouter.post('/', verificationMiddleware, (req: Request, res: Response) =
     .send(ReasonPhrases.NOT_IMPLEMENTED);
 });
 
-stationsRouter.put('//:stationsId', verificationMiddleware, (req: Request, res: Response) => {
+stationsRouter.put('/:stationsId', verificationMiddleware, (req: Request, res: Response) => {
   res
     .status(StatusCodes.NOT_IMPLEMENTED)
     .send(ReasonPhrases.NOT_IMPLEMENTED);
 });
 
-stationsRouter.delete('//:stationsId', verificationMiddleware, (req: Request, res: Response) => {
+stationsRouter.delete('/:stationsId', verificationMiddleware, (req: Request, res: Response) => {
   res
     .status(StatusCodes.NOT_IMPLEMENTED)
     .send(ReasonPhrases.NOT_IMPLEMENTED);

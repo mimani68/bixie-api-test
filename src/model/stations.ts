@@ -14,4 +14,13 @@ export class Station {
     }
   }
 
+  static async queryOnStations(at: string) {
+    let e = await Station.getAllStations()
+    if ( Array.isArray(e) ) {
+      return e.filter( ( el: any ) => el.date === at )
+    } else {
+      return null
+    }
+  }
+
 }
