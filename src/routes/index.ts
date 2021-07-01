@@ -48,8 +48,8 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
   let s: any;
   let w: any;
   if ( validationObject && !validationObject.error ) {
-    s = await StationService.queryOnStations( `${req.query.at}`, new Date().toISOString() )
-    w = await WeatherService.getLatestWeatherInfo( config.CITY )
+    s = await StationService.queryOnStations( new Date(`${req.query.at}`), new Date() )
+    w = await WeatherService.getLatestWeatherInfo( config.CITY, new Date(`${req.query.at}`) )
   } else {
     s = await StationService.getAllStations()
     w = await WeatherService.getLatestWeatherInfo( config.CITY )
@@ -60,10 +60,10 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
    * 
    */
   let response: ResponseModelInterface = {
-    weather: w.success ? w.data : {},
+    weather: w,
     stations: s
   }
-  if ( !validationObject.error && req.query.at ) {
+  if ( validationObject && !validationObject.error && req.query.at ) {
     response['at'] = req.query.at.toString()
   }
   return res
@@ -106,8 +106,7 @@ stationsRouter.get('/:stationsId', verificationMiddleware, async (req: Request, 
 stationsRouter.post('/', verificationMiddleware, async (req: Request, res: Response) => {
   let nextStoreData = new Date(lastUpdate)
   nextStoreData.setHours( nextStoreData.getHours() + +UPDATE_INTERVAL_IN_HOURS )
-  // if ( nextStoreData <= new Date() ) {
-  if ( true ) {
+  if ( nextStoreData <= new Date() ) {
     await StationService.updateStationData()
     await WeatherService.updateWeatherInfo( config.CITY )
     nextStoreData = new Date()

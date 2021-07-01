@@ -6,34 +6,43 @@ import { Stations } from '../models'
 import { error } from '../utils/log'
 import { stationApi } from '../utils/station_api'
 
-const LIMIT = 100;
+const LIMIT  = 100;
 const OFFSET = 0;
 
 export class StationService {
 
   static async getAllStations() {
-    return await Stations.findAll()
+    return await Stations.findAll({ 
+      offset: config.PAGE_OFFSET,
+      limit: config.PAGE_LIMIT,
+      raw: true
+    })
       .then( (d: any) => {
         if ( isEmpty(d) )
-          return 
-        d.data = JSON.parse(d.data)
+          return
+        for ( let item of d ) {
+          item.data = JSON.parse(item.data)
+        }
         return d
       })
   }
 
-  static async queryOnStations(from: string, sicne: string) {
+  static async queryOnStations(from: Date, sicne: Date) {
     return await Stations.findAll({
       where: and(
         { createdAt: { gte: from } },
         { createdAt: { lte: sicne } }
       ),
       offset: config.PAGE_OFFSET,
-      limit: config.PAGE_LIMIT
+      limit: config.PAGE_LIMIT,
+      raw: true
     })
       .then( (d: any) => {
         if ( isEmpty(d) )
           return
-        d.data = JSON.parse(d.data)
+        for ( let item of d ) {
+          item.data = JSON.parse(item.data)
+        }
         return d
       })
   }
@@ -49,12 +58,15 @@ export class StationService {
         ['createdAt', 'DESC' ]
       ],
       offset: config.PAGE_OFFSET,
-      limit: config.PAGE_LIMIT
+      limit: config.PAGE_LIMIT,
+      raw: true
     })
       .then( (d: any) => {
         if ( isEmpty(d) )
           return
-        d.data = JSON.parse(d.data)
+        for ( let item of d ) {
+          item.data = JSON.parse(item.data)
+        }
         return d
       })
   }
