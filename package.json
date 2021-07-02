@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start:prod": "node dist/server.js",
+    "start:local": "NODE_ENV=local node dist/server.js",
     "build": "tsc -p .",
     "dev": "nodemon --watch src/**/* -e ts,json --exec \"node --inspect=0.0.0.0:9229 -r ts-node/register src/server.ts\"",
     "test": "npx mocha"
