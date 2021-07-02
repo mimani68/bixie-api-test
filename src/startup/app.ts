@@ -36,7 +36,7 @@ app.use(helmet.referrerPolicy());
 app.use(helmet.xssFilter());
 
 app.get('/ping', (req: Request, res: Response)=>{
-    res.send('PONG');
+    res.status(200).send('PONG');
 });
 
 /**

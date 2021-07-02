@@ -31,7 +31,11 @@ stationsRouter.get('/', verificationMiddleware, async (req: Request, res: Respon
     })
     validationObject = querySchema.validate( req.query )
   }
-
+  if ( validationObject?.error ) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send(ReasonPhrases.BAD_REQUEST);
+  }
   /**
    * 
    * User `StationService` and `WeatherService` for retrive data from
