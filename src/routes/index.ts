@@ -8,6 +8,8 @@ import { ResponseModelInterface         } from '../view_model';
 import { config } from '../config';
 
 let lastUpdate = new Date();
+lastUpdate.setHours( lastUpdate.getHours() - 2)
+
 const UPDATE_INTERVAL_IN_HOURS = 1;
 
 export const stationsRouter = express.Router();
@@ -151,7 +153,7 @@ stationsRouter.post('/', verificationMiddleware, async (req: Request, res: Respo
   if ( nextStoreData <= new Date() ) {
     await StationService.updateStationData()
     await WeatherService.updateWeatherInfo( config.CITY )
-    nextStoreData = new Date()
+    lastUpdate = new Date()
     return res
       .status(StatusCodes.CREATED)
       .send(ReasonPhrases.CREATED);
