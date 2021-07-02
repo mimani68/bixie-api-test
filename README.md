@@ -113,3 +113,16 @@ Fork this project on github. When you're finished, send us the URL of your publi
 * Import the [historical data available from Indego](https://www.rideindego.com/about/data/) so that it is available via the queries above. Note that this is in addition to, not an alternative to, downloading live data periodically and adding it to your own historical database.
 * Anything else you think is cool, relevant, and consistent with the other requirements.
 
+## Result
+
+```bash
+curl --header 'Host:app.io' 130.185.120.237/ping
+curl --header 'Host:app.io' 130.185.120.237/api/v1/stations
+curl --header 'Host:app.io' 130.185.120.237/api/v1/stations?at=2013-12-01T10:00:00
+curl --header 'Host:app.io' 130.185.120.237/api/v1/stations/3004?at=2013-12-01T10:00:00
+curl --header 'Host:app.io' 130.185.120.237/api/v1/stations/3004?from=2013-12-01T10:00:00&to=2021-12-01T10:00:00&frequency=daily
+```
+Adminer for database managment
+```bash
+curl --header 'Host:db.app.io' 130.185.120.237/adminer
+```

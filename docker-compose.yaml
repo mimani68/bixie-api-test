@@ -50,7 +50,7 @@ services:
         restart: always
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.app.rule=Host(`localhost`)"
+            - "traefik.http.routers.app.rule=Host(`app.io`)"
             - "traefik.http.routers.app.entrypoints=web"
             # - "traefik.http.routers.app.entrypoints=websecure"
             # - "traefik.http.routers.app.tls.certresolver=app"
@@ -67,7 +67,8 @@ services:
             - ./:/app
         networks:
             - internal
-        command: ["npm", "run", "dev"]
+        # command: ["npm", "run", "dev"]
+        command: ["npm", "run", "start:prod"]
         
     db:
         image: postgres:12.3
@@ -97,7 +98,7 @@ services:
         restart: always
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.storage.rule=Host(`db.localhost`) && PathPrefix(`/adminer`)"
+            - "traefik.http.routers.storage.rule=Host(`db.app.io`) && PathPrefix(`/adminer`)"
             - "traefik.http.services.storage.loadbalancer.server.port=8080"
             - "traefik.http.routers.storage.entrypoints=web"
         networks:
