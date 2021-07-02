@@ -28,9 +28,6 @@ describe('API', function(){
         res.body.should.be.a('object');
         res.body.should.have.property('weather');
         res.body.should.have.property('stations');
-        // assert.typeOf(res.body.title, 'string', 'title is string');
-        // res.body.title.should.equal('Hello Title');
-        // res.body._id.should.equal(data.id);
         done();
       });
   });
